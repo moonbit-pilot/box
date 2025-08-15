@@ -20,23 +20,13 @@ pub(all) enum Horizontal {
 
 ///| Get the height (number of rows) of a box.
 /// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 3, 5)
-/// box.height() // returns 3
-/// ```
+/// Returns the number of rows in the box.
 pub fn height(self : Box) -> Int {
   self.data.length()
 }
 
 ///| Get the width (number of columns) of a box.
 /// Returns 0 for empty boxes.
-/// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 3, 5)
-/// box.width() // returns 5
-/// ```
 pub fn width(self : Box) -> Int {
   if self.height() == 0 {
     0
@@ -47,26 +37,14 @@ pub fn width(self : Box) -> Int {
 
 ///| Get both dimensions of a box as (height, width).
 /// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 3, 5)
-/// box.dimensions() // returns (3, 5)
-/// ```
+/// Returns a tuple containing (height, width).
 pub fn dimensions(self : Box) -> (Int, Int) {
   (self.height(), self.width())
 }
 
 ///| Convert a box to a string for display.
 /// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 2, 3)
-/// box.to_string() // returns
-/// ///|
-/// // ***
-/// // ***
-/// ///|
-/// ```
+/// Returns a string representation of the box suitable for printing.
 impl Show for Box with to_string(self) {
   let buf = @buffer.new()
   self.output(buf)
@@ -75,14 +53,7 @@ impl Show for Box with to_string(self) {
 
 ///| Output a box's content to a logger.
 /// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 2, 3)
-/// box.output(logger)
-/// // Logs:
-/// // ***
-/// // ***
-/// ```
+/// Sends the box content to the provided logger.
 impl Show for Box with output(self, logger) {
   logger.write_string(self.data.join("\n"))
 }
@@ -93,26 +64,11 @@ impl Show for Box with output(self, logger) {
 /// - `c`: The character to fill the box with
 /// - `h`: Height (number of rows)
 /// - `w`: Width (number of columns)
-/// 
-/// # Example
-/// ```moonbit
-/// let stars = fill('*', 3, 5)
-/// // Creates:
-/// // *****
-/// // *****
-/// // *****
-/// ```
 pub fn fill(c : Char, h : Int, w : Int) -> Box {
   { data: Array::make(h, String::repeat(c.to_string(), w)) }
 }
 
 ///| Create a 1×1 box containing a single character.
-/// 
-/// # Example
-/// ```moonbit
-/// let star = singleton('*')
-/// // Creates a single '*'
-/// ```
 pub fn singleton(c : Char) -> Box {
   fill(c, 1, 1)
 }
@@ -122,12 +78,6 @@ pub fn singleton(c : Char) -> Box {
 /// # Parameters
 /// - `h`: Height (number of rows)
 /// - `w`: Width (number of columns)
-/// 
-/// # Example
-/// ```moonbit
-/// let gap = space(2, 4)
-/// // Creates 2 rows of 4 spaces each
-/// ```
 pub fn space(h : Int, w : Int) -> Box {
   fill(' ', h, w)
 }
@@ -143,13 +93,6 @@ pub fn empty() -> Box {
 /// # Parameters
 /// - `r`: The box to place to the right
 /// - `align`: Vertical alignment (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let left = fill('L', 2, 3)
-/// let right = fill('R', 3, 2)
-/// let combined = left.beside(right, align=Top)
-/// ```
 pub fn beside(self : Box, r : Box, align~ : Vertical = Center) -> Box {
   guard self.width() != 0 else { r }
   guard r.width() != 0 else { self }
@@ -163,13 +106,6 @@ pub fn beside(self : Box, r : Box, align~ : Vertical = Center) -> Box {
 /// # Parameters
 /// - `b`: The box to place below
 /// - `align`: Horizontal alignment (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let top = fill('T', 1, 5)
-/// let bottom = fill('B', 2, 3)
-/// let stacked = top.above(bottom, align=Left)
-/// ```
 pub fn above(self : Box, b : Box, align~ : Horizontal = Center) -> Box {
   guard self.height() != 0 else { b }
   guard b.height() != 0 else { self }
@@ -183,13 +119,6 @@ pub fn above(self : Box, b : Box, align~ : Horizontal = Center) -> Box {
 /// # Parameters
 /// - `w`: Target width
 /// - `align`: Horizontal alignment of original content (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 2, 3)
-/// let widened = box.widen(7, align=Left)
-/// // Adds 4 spaces to the right
-/// ```
 pub fn widen(self : Box, w : Int, align~ : Horizontal = Center) -> Box {
   guard self.width() < w else { self }
   let (bh, bw) = self.dimensions()
@@ -206,13 +135,6 @@ pub fn widen(self : Box, w : Int, align~ : Horizontal = Center) -> Box {
 /// # Parameters
 /// - `h`: Target height
 /// - `align`: Vertical alignment of original content (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let box = fill('*', 2, 3)
-/// let heightened = box.heighten(5, align=Top)
-/// // Adds 3 rows of spaces below
-/// ```
 pub fn heighten(self : Box, h : Int, align~ : Vertical = Center) -> Box {
   guard self.height() < h else { self }
   let (bh, bw) = self.dimensions()
@@ -229,12 +151,6 @@ pub fn heighten(self : Box, h : Int, align~ : Vertical = Center) -> Box {
 /// # Parameters
 /// - `boxes`: Array of boxes to combine
 /// - `align`: Vertical alignment (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let boxes = [fill('A', 2, 1), fill('B', 3, 1), fill('C', 1, 1)]
-/// let combined = hconcat(boxes, align=Bottom)
-/// ```
 pub fn hconcat(boxes : Array[Box], align~ : Vertical = Center) -> Box {
   boxes.fold(init=empty(), fn(a, b) { a.beside(b, align~) })
 }
@@ -244,12 +160,6 @@ pub fn hconcat(boxes : Array[Box], align~ : Vertical = Center) -> Box {
 /// # Parameters
 /// - `boxes`: Array of boxes to combine
 /// - `align`: Horizontal alignment (default: Center)
-/// 
-/// # Example
-/// ```moonbit
-/// let boxes = [fill('A', 1, 3), fill('B', 1, 5), fill('C', 1, 2)]
-/// let stacked = vconcat(boxes, align=Left)
-/// ```
 pub fn vconcat(boxes : Array[Box], align~ : Horizontal = Center) -> Box {
   boxes.fold(init=empty(), fn(a, b) { a.above(b, align~) })
 }
@@ -259,36 +169,11 @@ pub fn vconcat(boxes : Array[Box], align~ : Horizontal = Center) -> Box {
 /// 
 /// # Parameters
 /// - `g`: 2D array where `g[i][j]` is the box at row i, column j
-/// 
-/// # Example
-/// ```moonbit
-/// let corner = singleton('+')
-/// let h_bar = fill('-', 1, 3)
-/// let v_bar = fill('|', 1, 1)
-/// let center = fill(' ', 1, 3)
-/// 
-/// let frame = grid([
-///   [corner, h_bar, corner],
-///   [v_bar, center, v_bar],
-///   [corner, h_bar, corner]
-/// ])
-/// ```
 pub fn grid(g : Array[Array[Box]]) -> Box {
   g.map(hconcat(_)) |> vconcat()
 }
 
 ///| Add a simple ASCII frame around a box using '+', '-', and '|' characters.
-/// 
-/// # Example
-/// ```moonbit
-/// let content = fill('*', 2, 4)
-/// let framed = content.framed()
-/// // Creates:
-/// // +----+
-/// // |****|
-/// // |****|
-/// // +----+
-/// ```
 pub fn framed(self : Box) -> Box {
   let (h, w) = self.dimensions()
   let v_bar = fill('|', h, 1)
